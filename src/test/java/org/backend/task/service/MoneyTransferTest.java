@@ -1,12 +1,12 @@
-package org.backend.test.service;
+package org.backend.task.service;
 
-import org.backend.test.dto.Account;
-import org.backend.test.dto.AccountState;
-import org.backend.test.dto.Transfer;
-import org.backend.test.dto.TransferError;
-import org.backend.test.events.AccountEvent;
-import org.backend.test.events.TransferDirection;
-import org.backend.test.events.TransferEvent;
+import org.backend.task.dto.Account;
+import org.backend.task.dto.AccountState;
+import org.backend.task.dto.Transfer;
+import org.backend.task.dto.TransferError;
+import org.backend.task.events.AccountStateEvent;
+import org.backend.task.events.TransferDirection;
+import org.backend.task.events.TransferEvent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -23,7 +23,7 @@ public class MoneyTransferTest extends AbstractTest {
 
     @BeforeClass
     public static void addMoneyToAccount() {
-        unlimitedAccount = AccountService.getInstance().process(new AccountEvent("UNLIMITED", AccountState.OPEN)).get();
+        unlimitedAccount = AccountService.getInstance().process(new AccountStateEvent("UNLIMITED", AccountState.OPEN)).get();
 
         TransferEvent transferEvent = TransferEvent.builder()
                 .amount(BigDecimal.valueOf(Long.MAX_VALUE))
@@ -42,7 +42,7 @@ public class MoneyTransferTest extends AbstractTest {
                 .amount(BigDecimal.TEN)
                 .creditAccountId(myAccount.getId())
                 .debitAccountId(unlimitedAccount.getId())
-                .description("test credit transfer")
+                .description("task credit transfer")
                 .build();
 
         accountService.transfer(transfer);
@@ -58,13 +58,13 @@ public class MoneyTransferTest extends AbstractTest {
                 .amount(BigDecimal.TEN)
                 .creditAccountId(myAccount.getId())
                 .debitAccountId(unlimitedAccount.getId())
-                .description("test credit transfer")
+                .description("task credit transfer")
                 .build();
         Transfer debitTransfer = Transfer.builder()
                 .amount(BigDecimal.valueOf(3))
                 .creditAccountId(unlimitedAccount.getId())
                 .debitAccountId(myAccount.getId())
-                .description("test debit transfer")
+                .description("task debit transfer")
                 .build();
 
         accountService.transfer(creditTransfer);
@@ -81,13 +81,13 @@ public class MoneyTransferTest extends AbstractTest {
                 .amount(BigDecimal.TEN)
                 .creditAccountId(myAccount.getId())
                 .debitAccountId(unlimitedAccount.getId())
-                .description("test credit transfer")
+                .description("task credit transfer")
                 .build();
         Transfer debitTransfer = Transfer.builder()
                 .amount(BigDecimal.valueOf(11))
                 .creditAccountId(unlimitedAccount.getId())
                 .debitAccountId(myAccount.getId())
-                .description("test debit transfer")
+                .description("task debit transfer")
                 .build();
 
         accountService.transfer(creditTransfer);
@@ -106,7 +106,7 @@ public class MoneyTransferTest extends AbstractTest {
                 .amount(BigDecimal.TEN)
                 .creditAccountId(fakeAccId)
                 .debitAccountId(unlimitedAccount.getId())
-                .description("test credit transfer")
+                .description("task credit transfer")
                 .build();
 
         Optional<TransferError> error = accountService.transfer(transfer);

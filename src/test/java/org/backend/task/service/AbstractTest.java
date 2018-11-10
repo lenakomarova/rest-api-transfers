@@ -1,9 +1,9 @@
-package org.backend.test.service;
+package org.backend.task.service;
 
 
-import org.backend.test.dto.Account;
-import org.backend.test.dto.AccountState;
-import org.backend.test.events.AccountEvent;
+import org.backend.task.dto.Account;
+import org.backend.task.dto.AccountState;
+import org.backend.task.events.AccountStateEvent;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -17,12 +17,12 @@ public abstract class AbstractTest {
     MoneyTransfersService moneyTransfersService = MoneyTransfersService.getInstance();
 
     Account createAccount() {
-        return accountService.process(new AccountEvent(UUID.randomUUID().toString(), AccountState.OPEN))
+        return accountService.process(new AccountStateEvent(UUID.randomUUID().toString(), AccountState.OPEN))
                 .orElseThrow(() -> new RuntimeException("Couldn't create account"));
     }
 
     Account closeAccount(String accountId) {
-        return accountService.process(new AccountEvent(accountId, AccountState.CLOSED))
+        return accountService.process(new AccountStateEvent(accountId, AccountState.CLOSED))
                 .orElseThrow(() -> new RuntimeException("Couldn't close account"));
     }
 

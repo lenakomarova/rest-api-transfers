@@ -1,7 +1,7 @@
-package org.backend.test.service;
+package org.backend.task.service;
 
-import org.backend.test.dto.Account;
-import org.backend.test.dto.AccountState;
+import org.backend.task.dto.Account;
+import org.backend.task.dto.AccountState;
 import org.junit.Test;
 
 import java.math.BigDecimal;

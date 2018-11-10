@@ -1,29 +1,29 @@
-package org.backend.test.service;
+package org.backend.task.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.backend.test.dto.Account;
-import org.backend.test.dto.AccountState;
-import org.backend.test.dto.Transfer;
-import org.backend.test.dto.TransferError;
-import org.backend.test.events.AccountEvent;
+import org.backend.task.dto.Account;
+import org.backend.task.dto.AccountState;
+import org.backend.task.dto.Transfer;
+import org.backend.task.dto.TransferError;
+import org.backend.task.events.AccountStateEvent;
 
 import java.util.*;
 
-import static org.backend.test.dto.TransferError.ACCOUNT_NOT_EXISTS;
+import static org.backend.task.dto.TransferError.ACCOUNT_NOT_EXISTS;
 
 @Slf4j
 public class AccountService {
     private final MoneyTransfersService moneyTransfers = MoneyTransfersService.getInstance();
-    private final Map<String, LinkedList<AccountEvent>> accountEvents = new HashMap<>();
+    private final Map<String, LinkedList<AccountStateEvent>> accountEvents = new HashMap<>();
 
-    public Optional<Account> process(AccountEvent event) {
+    public Optional<Account> process(AccountStateEvent event) {
         log.info("Received event, {}", event);
         accountEvents.computeIfAbsent(event.getAccountId(), id -> new LinkedList<>()).add(event);
         return findById(event.getAccountId());
     }
 
     public Optional<Account> findById(String accountId) {
-        LinkedList<AccountEvent> events = accountEvents.get(accountId);
+        LinkedList<AccountStateEvent> events = accountEvents.get(accountId);
         if (events == null || events.size() == 0) {
             log.warn("account not found by id: {}", accountId);
             return Optional.empty();
@@ -50,12 +50,10 @@ public class AccountService {
     private AccountService() {
     }
 
-    private static class AccountServiceHolder {
-        private static final AccountService INSTANCE = new AccountService();
-    }
+    private static final AccountService INSTANCE = new AccountService();
 
     public static AccountService getInstance() {
-        return AccountServiceHolder.INSTANCE;
+        return INSTANCE;
     }
 
 }

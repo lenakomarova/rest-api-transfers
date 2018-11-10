@@ -1,12 +1,12 @@
-package org.backend.test.dto;
+package org.backend.task.dto;
 
 
 import lombok.Builder;
-import lombok.Data;
+import lombok.Value;
 
 import java.math.BigDecimal;
 
-@Data
+@Value
 @Builder
 public class Transfer {
     private final BigDecimal amount;

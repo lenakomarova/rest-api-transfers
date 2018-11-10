@@ -1,4 +1,4 @@
-package org.backend.test.dto;
+package org.backend.task.dto;
 
 public enum AccountState {
     OPEN,

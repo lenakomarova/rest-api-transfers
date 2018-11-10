@@ -1,17 +1,17 @@
-package org.backend.test.events;
+package org.backend.task.events;
 
-import lombok.Data;
-import org.backend.test.dto.AccountState;
+import lombok.Value;
+import org.backend.task.dto.AccountState;
 
 import java.time.LocalDateTime;
 
-@Data
-public class AccountEvent {
+@Value
+public class AccountStateEvent {
     final String accountId;
     final AccountState state;
     final LocalDateTime time;
 
-    public AccountEvent(String accountId, AccountState state) {
+    public AccountStateEvent(String accountId, AccountState state) {
         this.accountId = accountId;
         this.state = state;
         this.time = LocalDateTime.now();

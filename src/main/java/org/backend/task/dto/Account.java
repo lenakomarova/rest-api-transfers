@@ -1,11 +1,11 @@
-package org.backend.test.dto;
+package org.backend.task.dto;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Value;
 
 import java.math.BigDecimal;
 
-@Getter
+@Value
 @Builder
 public class Account {
     private final String id;

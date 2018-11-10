@@ -1,10 +1,10 @@
-package org.backend.test.service;
+package org.backend.task.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.backend.test.dto.Transfer;
-import org.backend.test.dto.TransferError;
-import org.backend.test.events.TransferDirection;
-import org.backend.test.events.TransferEvent;
+import org.backend.task.dto.Transfer;
+import org.backend.task.dto.TransferError;
+import org.backend.task.events.TransferDirection;
+import org.backend.task.events.TransferEvent;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.backend.test.dto.TransferError.INSUFFICIENT_FUNDS;
+import static org.backend.task.dto.TransferError.INSUFFICIENT_FUNDS;
 
 @Slf4j
 public class MoneyTransfersService {
@@ -57,15 +57,13 @@ public class MoneyTransfersService {
         return Optional.empty();
     }
 
-    private static class MoneyTransfersServiceHolder {
-        private static final MoneyTransfersService INSTANCE = new MoneyTransfersService();
-    }
+    private static final MoneyTransfersService INSTANCE = new MoneyTransfersService();
 
     private MoneyTransfersService() {
     }
 
     public static MoneyTransfersService getInstance() {
-        return MoneyTransfersServiceHolder.INSTANCE;
+        return INSTANCE;
     }
 
 
