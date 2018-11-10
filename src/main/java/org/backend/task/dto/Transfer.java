@@ -1,6 +1,5 @@
 package org.backend.task.dto;
 
-
 import lombok.Builder;
 import lombok.Value;
 
@@ -11,7 +10,5 @@ import java.math.BigDecimal;
 public class Transfer {
     private final BigDecimal amount;
     private final String description;
-
-    private final String debitAccountId;
-    private final String creditAccountId;
+    private final long involvedAccount;
 }

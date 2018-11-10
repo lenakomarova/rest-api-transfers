@@ -17,12 +17,12 @@ public abstract class AbstractTest {
     MoneyTransfersService moneyTransfersService = MoneyTransfersService.getInstance();
 
     Account createAccount() {
-        return accountService.process(new AccountStateEvent(UUID.randomUUID().toString(), AccountState.OPEN))
+        return accountService.create()
                 .orElseThrow(() -> new RuntimeException("Couldn't create account"));
     }
 
-    Account closeAccount(String accountId) {
-        return accountService.process(new AccountStateEvent(accountId, AccountState.CLOSED))
+    Account closeAccount(long accountId) {
+        return accountService.close(accountId)
                 .orElseThrow(() -> new RuntimeException("Couldn't close account"));
     }
 

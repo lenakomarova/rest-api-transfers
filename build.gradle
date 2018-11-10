@@ -9,9 +9,25 @@ repositories {
     mavenCentral()
 }
 
+jar {
+    manifest {
+        attributes "Main-Class": "io.vertx.core.Launcher",
+                "Main-Verticle": "org.backend.task.VertxApplication"
+    }
+
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
 dependencies {
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
-    compile group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.3'
+    compile('org.slf4j:slf4j-api:1.7.25')
+    compile('ch.qos.logback:logback-classic:1.2.3')
+    compile('io.vertx:vertx-core:3.5.4')
+    compile('io.vertx:vertx-web:3.5.4')
+//    compile('io.vertx:vertx-jdbc-client:3.5.4')
+//    compile('org.hsql.db:hsqldb:2.3.3')
     implementation('org.projectlombok:lombok:+')
-    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile('junit:junit:4.12')
+    testCompile('io.vertx:vertx-unit:3.5.4')
 }

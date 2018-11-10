@@ -7,13 +7,8 @@ import java.time.LocalDateTime;
 
 @Value
 public class AccountStateEvent {
-    final String accountId;
+    final long accountId;
     final AccountState state;
-    final LocalDateTime time;
+    final LocalDateTime time = LocalDateTime.now();
 
-    public AccountStateEvent(String accountId, AccountState state) {
-        this.accountId = accountId;
-        this.state = state;
-        this.time = LocalDateTime.now();
-    }
 }
