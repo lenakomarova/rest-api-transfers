@@ -97,10 +97,18 @@ public class RequestHandler {
 
     public void transfer(RoutingContext routingContext) {
         String id = routingContext.request().getParam("id");
-        final Transfer transfer = Json.decodeValue(routingContext.getBodyAsString(), Transfer.class);
-        if (id == null || transfer == null) {
+        String to = routingContext.request().getParam("to");
+        Transfer transfer = Json.decodeValue(routingContext.getBodyAsString(), Transfer.class);
+        if (id == null || transfer == null || to == null && transfer.getInvolvedAccount() == 0) {
             routingContext.response().setStatusCode(417).end();
         } else {
+            if (transfer.getInvolvedAccount() == 0) {
+                transfer = Transfer.builder()
+                        .amount(transfer.getAmount())
+                        .description(transfer.getDescription())
+                        .involvedAccount(Long.parseLong(to))
+                        .build();
+            }
             Optional<TransferError> error = accountService.transfer(Long.valueOf(id), transfer);
             if (error.isPresent()) {
                 routingContext.response()
@@ -109,6 +117,7 @@ public class RequestHandler {
                         .end(Json.encodePrettily(error.get()));
             } else {
                 routingContext.response()
+                        .putHeader("content-type", "application/json; charset=utf-8")
                         .setStatusCode(200)
                         .end();
             }

@@ -93,7 +93,7 @@ public class VertxApplication extends AbstractVerticle {
         router.delete("/accounts/:id").handler(requestHandler::close);
 
         router.get("/accounts/:id/transfers").handler(requestHandler::getTransfers);
-        router.post("/accounts/:id/transfers").handler(requestHandler::transfer);
+        router.post("/accounts/:id/transfers/:to").handler(requestHandler::transfer);
 
         vertx
                 .createHttpServer()

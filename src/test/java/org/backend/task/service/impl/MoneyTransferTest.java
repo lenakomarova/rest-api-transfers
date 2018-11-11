@@ -4,8 +4,6 @@ import org.backend.task.dto.Account;
 import org.backend.task.dto.AccountState;
 import org.backend.task.dto.Transfer;
 import org.backend.task.dto.TransferError;
-import org.backend.task.events.TransferDirection;
-import org.backend.task.events.TransferEvent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -21,17 +19,7 @@ public class MoneyTransferTest extends AbstractTest {
 
     @BeforeClass
     public static void addMoneyToAccount() {
-        unlimitedAccount = accountService.create().get();
-
-        TransferEvent transferEvent = TransferEvent.builder()
-                .amount(BigDecimal.valueOf(Long.MAX_VALUE))
-                .currentBalance(BigDecimal.valueOf(Long.MAX_VALUE))
-                .description("Unlimited Money Account")
-                .direction(TransferDirection.CREDIT)
-                .involvedAccountId(-1)
-                .build();
-
-        ((ServiceFactoryImpl)ServiceFactoryImpl.INSTANCE).DATABASE_SERVICE.addTransferEvent(unlimitedAccount.getId(), transferEvent);
+        unlimitedAccount = fillAccount(BigDecimal.valueOf(Long.MAX_VALUE));
     }
 
     @Test
@@ -138,10 +126,9 @@ public class MoneyTransferTest extends AbstractTest {
 
         List<Transfer> transfers = accountService.getTransfers(myAccount.getId());
 
-       assertNotNull(transfers);
-       assertEquals(2, transfers.size());
+        assertNotNull(transfers);
+        assertEquals(2, transfers.size());
     }
-
 
 
 }
