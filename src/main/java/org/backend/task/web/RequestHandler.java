@@ -9,6 +9,7 @@ import org.backend.task.dto.Account;
 import org.backend.task.dto.Transfer;
 import org.backend.task.dto.TransferError;
 import org.backend.task.service.AccountService;
+import org.backend.task.service.impl.SynchronizedServiceFactory;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,7 +22,7 @@ public class RequestHandler {
         return INSTANCE;
     }
 
-    private AccountService accountService = AccountService.getInstance();
+    private AccountService accountService = SynchronizedServiceFactory.INSTANCE.accountService();
 
     public void getAll(RoutingContext routingContext) {
         List<Account> accounts = accountService.findAll();

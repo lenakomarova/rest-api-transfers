@@ -1,21 +1,19 @@
-package org.backend.task.service;
+package org.backend.task.service.impl;
 
 import org.backend.task.dto.Account;
 import org.backend.task.dto.AccountState;
 import org.backend.task.dto.Transfer;
 import org.backend.task.dto.TransferError;
-import org.backend.task.events.AccountStateEvent;
 import org.backend.task.events.TransferDirection;
 import org.backend.task.events.TransferEvent;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class MoneyTransferTest extends AbstractTest {
 
@@ -23,7 +21,7 @@ public class MoneyTransferTest extends AbstractTest {
 
     @BeforeClass
     public static void addMoneyToAccount() {
-        unlimitedAccount = AccountService.getInstance().process(new AccountStateEvent(-1, AccountState.OPEN)).get();
+        unlimitedAccount = accountService.create().get();
 
         TransferEvent transferEvent = TransferEvent.builder()
                 .amount(BigDecimal.valueOf(Long.MAX_VALUE))
@@ -32,7 +30,8 @@ public class MoneyTransferTest extends AbstractTest {
                 .direction(TransferDirection.CREDIT)
                 .involvedAccountId(-1)
                 .build();
-        MoneyTransfersService.getInstance().submit(unlimitedAccount.getId(), transferEvent);
+
+        ((ServiceFactoryImpl)ServiceFactoryImpl.INSTANCE).DATABASE_SERVICE.addTransferEvent(unlimitedAccount.getId(), transferEvent);
     }
 
     @Test
@@ -124,6 +123,23 @@ public class MoneyTransferTest extends AbstractTest {
 
         assertTrue(error.isPresent());
         assertEquals(TransferError.AMOUNT_MUST_BE_POSITIVE, error.get());
+    }
+
+    @Test
+    public void getAll() {
+        Account myAccount = createAccount();
+        Transfer transfer = Transfer.builder()
+                .amount(BigDecimal.TEN)
+                .involvedAccount(myAccount.getId())
+                .description("test credit transfer")
+                .build();
+        accountService.transfer(unlimitedAccount.getId(), transfer);
+        accountService.transfer(unlimitedAccount.getId(), transfer);
+
+        List<Transfer> transfers = accountService.getTransfers(myAccount.getId());
+
+       assertNotNull(transfers);
+       assertEquals(2, transfers.size());
     }
 
 

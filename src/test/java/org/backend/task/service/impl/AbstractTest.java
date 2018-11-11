@@ -1,20 +1,18 @@
-package org.backend.task.service;
+package org.backend.task.service.impl;
 
 
 import org.backend.task.dto.Account;
 import org.backend.task.dto.AccountState;
-import org.backend.task.events.AccountStateEvent;
+import org.backend.task.service.AccountService;
 
 import java.math.BigDecimal;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractTest {
-    AccountService accountService = AccountService.getInstance();
-    MoneyTransfersService moneyTransfersService = MoneyTransfersService.getInstance();
+    static AccountService accountService = SynchronizedServiceFactory.INSTANCE.accountService();
 
     Account createAccount() {
         return accountService.create()
