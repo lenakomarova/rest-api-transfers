@@ -1,5 +1,6 @@
 package org.backend.task.web;
 
+import com.google.common.base.Strings;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 import lombok.AccessLevel;
@@ -101,29 +102,36 @@ public class RequestHandler {
     public void transfer(RoutingContext routingContext) {
         String id = routingContext.request().getParam("id");
         String to = routingContext.request().getParam("to");
-        Transfer transfer = Json.decodeValue(routingContext.getBodyAsString(), Transfer.class);
-        if (id == null || !id.matches("\\d+") || transfer == null || to == null && transfer.getInvolvedAccount() == 0) {
+        String transferStr = routingContext.getBodyAsString();
+        if (id == null || !id.matches("\\d+") || Strings.isNullOrEmpty(transferStr)) {
             routingContext.response().setStatusCode(417).end();
-        } else {
-            if (transfer.getInvolvedAccount() == 0) {
-                transfer = Transfer.builder()
-                        .amount(transfer.getAmount())
-                        .description(transfer.getDescription())
-                        .involvedAccount(Long.parseLong(to))
-                        .build();
-            }
-            Optional<TransferError> error = accountService.transfer(Long.valueOf(id), transfer);
-            if (error.isPresent()) {
-                routingContext.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .setStatusCode(417)
-                        .end(Json.encodePrettily(new ErrorText(error.get().getText())));
-            } else {
-                routingContext.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .setStatusCode(200)
-                        .end();
-            }
+            return;
         }
+
+        Transfer transfer = Json.decodeValue(transferStr, Transfer.class);
+        if (Strings.isNullOrEmpty(to) && transfer.getInvolvedAccount() == 0) {
+            routingContext.response().setStatusCode(417).end();
+            return;
+        }
+        if (transfer.getInvolvedAccount() == 0) {
+            transfer = Transfer.builder()
+                    .amount(transfer.getAmount())
+                    .description(transfer.getDescription())
+                    .involvedAccount(Long.parseLong(to))
+                    .build();
+        }
+        Optional<TransferError> error = accountService.transfer(Long.valueOf(id), transfer);
+        if (error.isPresent()) {
+            routingContext.response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .setStatusCode(417)
+                    .end(Json.encodePrettily(new ErrorText(error.get().getText())));
+        } else {
+            routingContext.response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .setStatusCode(200)
+                    .end();
+        }
+
     }
 }
