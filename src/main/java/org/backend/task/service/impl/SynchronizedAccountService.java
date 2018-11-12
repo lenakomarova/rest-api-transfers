@@ -25,17 +25,17 @@ public class SynchronizedAccountService implements AccountService {
 
     @Override
     public Optional<TransferError> transfer(Long debitAccountId, Transfer transfer) {
-        return lockingService.invokeConcurrently(() -> delegate.transfer(debitAccountId, transfer));
+        return lockingService.invokeConcurrently(() -> delegate.transfer(debitAccountId, transfer), debitAccountId, transfer.getInvolvedAccount());
     }
 
     @Override
     public Optional<Account> create() {
-        return lockingService.invokeConcurrently(delegate::create);
+        return delegate.create();
     }
 
     @Override
     public Optional<Account> close(Long id) {
-        return lockingService.invokeConcurrently(() -> delegate.close(id));
+        return delegate.close(id);
     }
 
     @Override

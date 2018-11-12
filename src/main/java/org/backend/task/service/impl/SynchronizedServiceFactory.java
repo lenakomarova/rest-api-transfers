@@ -8,7 +8,7 @@ import org.backend.task.service.ServiceFactory;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SynchronizedServiceFactory implements ServiceFactory {
-    public static ServiceFactory INSTANCE = new SynchronizedServiceFactory();
+    public static final ServiceFactory INSTANCE = new SynchronizedServiceFactory();
 
     final LockingService LOCKING_SERVICE = new LockingServiceImpl();
     final AccountService ACCOUNT_SERVICE = new SynchronizedAccountService(ServiceFactoryImpl.INSTANCE.accountService(), LOCKING_SERVICE);

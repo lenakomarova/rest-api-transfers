@@ -10,7 +10,7 @@ import org.backend.task.service.ServiceFactory;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ServiceFactoryImpl implements ServiceFactory {
 
-    public static ServiceFactory INSTANCE = new ServiceFactoryImpl();
+    public static final ServiceFactory INSTANCE = new ServiceFactoryImpl();
 
     final DatabaseService DATABASE_SERVICE = new DatabaseServiceImpl();
     final MoneyTransfersService MONEY_TRANSFERS_SERVICE = new MoneyTransfersServiceImpl(DATABASE_SERVICE);
