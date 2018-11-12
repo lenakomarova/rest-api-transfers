@@ -2,13 +2,13 @@ package org.backend.task.dto;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Value;
-
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import java.math.BigDecimal;
 
-@Value
+@Getter
+@EqualsAndHashCode(of = "id")
 @Builder
 public class Account {
     private final long id;

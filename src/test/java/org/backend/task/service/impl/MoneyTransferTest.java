@@ -4,7 +4,7 @@ import org.backend.task.dto.Account;
 import org.backend.task.dto.AccountState;
 import org.backend.task.dto.Transfer;
 import org.backend.task.dto.TransferError;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigDecimal;
@@ -15,11 +15,11 @@ import static org.junit.Assert.*;
 
 public class MoneyTransferTest extends AbstractTest {
 
-    private static Account unlimitedAccount;
+    private Account unlimitedAccount;
 
-    @BeforeClass
-    public static void addMoneyToAccount() {
-        unlimitedAccount = fillAccount(BigDecimal.valueOf(Long.MAX_VALUE));
+    @Before
+    public void addMoneyToAccount() {
+        unlimitedAccount = fillAccount(BigDecimal.valueOf(Long.MAX_VALUE), serviceContext);
     }
 
     @Test

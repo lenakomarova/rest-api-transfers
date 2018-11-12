@@ -10,6 +10,7 @@ import org.backend.task.events.TransferEvent;
 import org.backend.task.service.DatabaseService;
 import org.backend.task.service.MoneyTransfersService;
 
+import javax.inject.Inject;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -18,8 +19,8 @@ import static org.backend.task.dto.TransferError.AMOUNT_MUST_BE_POSITIVE;
 import static org.backend.task.dto.TransferError.INSUFFICIENT_FUNDS;
 
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class MoneyTransfersServiceImpl implements MoneyTransfersService {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE, onConstructor = @_(@Inject))
+class MoneyTransfersServiceImpl implements MoneyTransfersService {
 
     private final DatabaseService databaseService;
 
@@ -64,11 +65,13 @@ public class MoneyTransfersServiceImpl implements MoneyTransfersService {
 
     @Override
     public List<Transfer> getTransfers(Long accountId) {
-        return databaseService.getTransferEventsHistory(accountId).stream().map(e -> Transfer
-                .builder()
-                .amount(e.getDirection() == TransferDirection.CREDIT ? e.getAmount() : e.getAmount().negate())
-                .involvedAccount(e.getInvolvedAccountId())
-                .description(e.getDescription())
-                .build()).collect(Collectors.toList());
+        return databaseService.getTransferEventsHistory(accountId)
+                .stream()
+                .map(e -> Transfer.builder()
+                        .amount(e.getDirection() == TransferDirection.CREDIT ? e.getAmount() : e.getAmount().negate())
+                        .involvedAccount(e.getInvolvedAccountId())
+                        .description(e.getDescription())
+                        .build())
+                .collect(Collectors.toList());
     }
 }

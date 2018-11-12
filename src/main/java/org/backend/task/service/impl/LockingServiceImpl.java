@@ -1,11 +1,12 @@
 package org.backend.task.service.impl;
 
 import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.backend.task.service.LockingService;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -15,13 +16,16 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.LongStream;
 
 @Slf4j
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
-public class LockingServiceImpl implements LockingService {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE, onConstructor = @_(@Inject))
+class LockingServiceImpl implements LockingService {
     private final Map<Long, Lock> ID_LOCKS_MAP = new ConcurrentHashMap<>();
 
     @SneakyThrows
     @Override
     public <T> T invokeConcurrently(Callable<T> task, long ... lockByIds) {
+        if (lockByIds == null || lockByIds.length == 0) {
+            throw new IllegalArgumentException("Ids must be supplied");
+        }
         long[] ids = lockByIds.clone();
         Arrays.sort(ids);
 

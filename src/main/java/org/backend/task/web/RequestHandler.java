@@ -6,10 +6,11 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.backend.task.dto.Account;
+import org.backend.task.dto.ErrorText;
 import org.backend.task.dto.Transfer;
 import org.backend.task.dto.TransferError;
 import org.backend.task.service.AccountService;
-import org.backend.task.service.impl.SynchronizedServiceFactory;
+import org.backend.task.service.impl.ServiceContext;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,12 +18,9 @@ import java.util.Optional;
 @Slf4j
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class RequestHandler {
-    private static RequestHandler INSTANCE = new RequestHandler();
-    public static RequestHandler getInstance() {
-        return INSTANCE;
-    }
+    public static final RequestHandler INSTANCE = new RequestHandler();
 
-    private AccountService accountService = SynchronizedServiceFactory.INSTANCE.accountService();
+    private final AccountService accountService = ServiceContext.INSTANCE.getAccountService();
 
     public void getAll(RoutingContext routingContext) {
         List<Account> accounts = accountService.findAll();
@@ -47,7 +45,7 @@ public class RequestHandler {
 
     public void findById(RoutingContext routingContext) {
         String id = routingContext.request().getParam("id");
-        if (id == null) {
+        if (id == null || !id.matches("\\d+")) {
             routingContext.response().setStatusCode(417).end();
         } else {
             Optional<Account> account = accountService.findById(Long.valueOf(id));
@@ -65,15 +63,14 @@ public class RequestHandler {
 
     public void close(RoutingContext routingContext) {
         String id = routingContext.request().getParam("id");
-        if (id == null) {
+        if (id == null || !id.matches("\\d+")) {
             routingContext.response().setStatusCode(417).end();
         } else {
             Optional<Account> account = accountService.close(Long.valueOf(id));
             if (account.isPresent()) {
                 routingContext.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
                         .setStatusCode(204)
-                        .end(Json.encodePrettily(account.get()));
+                        .end();
             } else {
                 routingContext.response()
                         .setStatusCode(404)
@@ -84,13 +81,13 @@ public class RequestHandler {
 
     public void getTransfers(RoutingContext routingContext) {
         String id = routingContext.request().getParam("id");
-        if (id == null) {
+        if (id == null || !id.matches("\\d+")) {
             routingContext.response().setStatusCode(417).end();
         } else {
             List<Transfer> transfers = accountService.getTransfers(Long.valueOf(id));
                 routingContext.response()
                         .putHeader("content-type", "application/json; charset=utf-8")
-                        .setStatusCode(204)
+                        .setStatusCode(200)
                         .end(Json.encodePrettily(transfers));
         }
     }
@@ -99,7 +96,7 @@ public class RequestHandler {
         String id = routingContext.request().getParam("id");
         String to = routingContext.request().getParam("to");
         Transfer transfer = Json.decodeValue(routingContext.getBodyAsString(), Transfer.class);
-        if (id == null || transfer == null || to == null && transfer.getInvolvedAccount() == 0) {
+        if (id == null || !id.matches("\\d+") || transfer == null || to == null && transfer.getInvolvedAccount() == 0) {
             routingContext.response().setStatusCode(417).end();
         } else {
             if (transfer.getInvolvedAccount() == 0) {
@@ -114,7 +111,7 @@ public class RequestHandler {
                 routingContext.response()
                         .putHeader("content-type", "application/json; charset=utf-8")
                         .setStatusCode(417)
-                        .end(Json.encodePrettily(error.get()));
+                        .end(Json.encodePrettily(new ErrorText(error.get().getText())));
             } else {
                 routingContext.response()
                         .putHeader("content-type", "application/json; charset=utf-8")

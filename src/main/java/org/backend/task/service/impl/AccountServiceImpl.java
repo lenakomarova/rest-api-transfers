@@ -12,6 +12,7 @@ import org.backend.task.service.AccountService;
 import org.backend.task.service.DatabaseService;
 import org.backend.task.service.MoneyTransfersService;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -19,9 +20,9 @@ import java.util.stream.Collectors;
 import static org.backend.task.dto.TransferError.ACCOUNT_NOT_EXISTS;
 
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class AccountServiceImpl implements AccountService {
-    private static final AtomicLong ID_GENERATOR = new AtomicLong();
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE, onConstructor = @_(@Inject))
+class AccountServiceImpl implements AccountService {
+    private final AtomicLong idGenerator = new AtomicLong();
 
     private final MoneyTransfersService moneyTransfers;
     private final DatabaseService databaseService;
@@ -55,13 +56,17 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Optional<Account> create() {
-        AccountStateEvent event = new AccountStateEvent(ID_GENERATOR.incrementAndGet(), AccountState.OPEN);
+        AccountStateEvent event = new AccountStateEvent(idGenerator.incrementAndGet(), AccountState.OPEN);
         databaseService.addAccountStateEvent(event.getAccountId(), event);
         return findById(event.getAccountId());
     }
 
     @Override
     public Optional<Account> close(Long id) {
+        if (!findById(id).isPresent()) {
+            log.warn("Account requested to close doesn't exist");
+            return Optional.empty();
+        }
         AccountStateEvent event = new AccountStateEvent(id, AccountState.CLOSED);
         databaseService.addAccountStateEvent(event.getAccountId(), event);
         return findById(id);

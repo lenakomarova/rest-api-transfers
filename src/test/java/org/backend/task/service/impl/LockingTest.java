@@ -1,6 +1,5 @@
 package org.backend.task.service.impl;
 
-import org.backend.task.service.LockingService;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -14,10 +13,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class LockingTest extends AbstractTest {
 
-    private final LockingService lockingService = new LockingServiceImpl();
-
     @Test
-    public void create() {
+    public void success() {
         Map<Long, AtomicBoolean> runningMap = new ConcurrentHashMap<>();
 
         Callable<Void> one = createCallable(runningMap, 1);
@@ -30,6 +27,13 @@ public class LockingTest extends AbstractTest {
         executorService.submit(() -> lockingService.invokeConcurrently(two, 2));
         executorService.submit(() -> lockingService.invokeConcurrently(oneAndTwo, 1, 2));
 
+    }
+
+    @Test(expected = Exception.class)
+    public void fail() {
+        lockingService.invokeConcurrently(() -> {
+            throw new Exception();
+        });
     }
 
     private Callable<Void> createCallable(Map<Long, AtomicBoolean> runningsMap, long ... ids) {

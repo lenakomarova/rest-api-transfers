@@ -6,6 +6,9 @@ import org.backend.task.dto.AccountState;
 import org.backend.task.events.TransferDirection;
 import org.backend.task.events.TransferEvent;
 import org.backend.task.service.AccountService;
+import org.backend.task.service.DatabaseService;
+import org.backend.task.service.LockingService;
+import org.junit.Before;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -14,26 +17,38 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public abstract class AbstractTest {
-    static AccountService accountService = SynchronizedServiceFactory.INSTANCE.accountService();
 
-    protected Account createAccount() {
+    protected ServiceContext serviceContext;
+    protected AccountService accountService;
+    protected DatabaseService databaseService;
+    protected LockingService lockingService;
+
+    @Before
+    public void setUp() {
+        serviceContext = new ServiceContext();
+        accountService = serviceContext.getAccountService();
+        databaseService = serviceContext.getDatabaseService();
+        lockingService = serviceContext.getLockingService();
+    }
+
+    Account createAccount() {
         return accountService.create()
                 .orElseThrow(() -> new RuntimeException("Couldn't create account"));
     }
 
-    protected Account closeAccount(long accountId) {
+    Account closeAccount(long accountId) {
         return accountService.close(accountId)
                 .orElseThrow(() -> new RuntimeException("Couldn't close account"));
     }
 
-    protected void checkStateAndBalance(AccountState state, BigDecimal balance, Optional<Account> account) {
+    void checkStateAndBalance(AccountState state, BigDecimal balance, Optional<Account> account) {
         assertTrue(account.isPresent());
         assertEquals(state, account.get().getState());
         assertEquals(balance, account.get().getBalance());
     }
 
-    protected static Account fillAccount(BigDecimal balance){
-        Account unlimitedAccount = SynchronizedServiceFactory.INSTANCE.accountService().create().get();
+    public static Account fillAccount(BigDecimal balance, ServiceContext serviceContext){
+        Account unlimitedAccount = serviceContext.getAccountService().create().get();
 
         TransferEvent transferEvent = TransferEvent.builder()
                 .amount(balance)
@@ -43,7 +58,7 @@ public abstract class AbstractTest {
                 .involvedAccountId(-1)
                 .build();
 
-        ((ServiceFactoryImpl)ServiceFactoryImpl.INSTANCE).DATABASE_SERVICE.addTransferEvent(unlimitedAccount.getId(), transferEvent);
+        serviceContext.getDatabaseService().addTransferEvent(unlimitedAccount.getId(), transferEvent);
         return unlimitedAccount;
     }
 

@@ -2,15 +2,13 @@ package org.backend.task.service.impl;
 
 import org.backend.task.dto.Account;
 import org.backend.task.dto.AccountState;
-import org.backend.task.service.AccountService;
-import org.backend.task.service.DatabaseService;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 public class AccountTest extends AbstractTest {
 
@@ -43,13 +41,12 @@ public class AccountTest extends AbstractTest {
 
     @Test
     public void getAll() {
-        DatabaseService databaseService = new DatabaseServiceImpl();
-        AccountService accountService = new AccountServiceImpl(new MoneyTransfersServiceImpl(databaseService), databaseService);
-        accountService.create(); accountService.create(); accountService.create();
+        final int numAccounts = 42;
+        IntStream.range(0, numAccounts).forEach(i -> accountService.create());
 
         List<Account> accounts = accountService.findAll();
 
-        Assert.assertEquals(3, accounts.size());
+        Assert.assertEquals(numAccounts, accounts.size());
     }
 
 }

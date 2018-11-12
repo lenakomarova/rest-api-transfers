@@ -9,12 +9,13 @@ import org.backend.task.dto.TransferError;
 import org.backend.task.service.AccountService;
 import org.backend.task.service.LockingService;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
 
 @Slf4j
-@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
-public class SynchronizedAccountService implements AccountService {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE, onConstructor = @_(@Inject))
+class SynchronizedAccountServiceImpl implements AccountService {
     private final AccountService delegate;
     private final LockingService lockingService;
 

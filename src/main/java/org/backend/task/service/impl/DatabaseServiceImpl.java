@@ -1,19 +1,22 @@
 package org.backend.task.service.impl;
 
 
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.backend.task.events.AccountStateEvent;
 import org.backend.task.events.TransferEvent;
 import org.backend.task.service.DatabaseService;
 
+import javax.inject.Inject;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class DatabaseServiceImpl implements DatabaseService {
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE, onConstructor = @_(@Inject))
+class DatabaseServiceImpl implements DatabaseService {
     private final Map<Long, ConcurrentLinkedDeque<AccountStateEvent>> accountEvents = new ConcurrentHashMap<>();
     private final Map<Long, ConcurrentLinkedDeque<TransferEvent>> transferEvents = new ConcurrentHashMap<>();
 

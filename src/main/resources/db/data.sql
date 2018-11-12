@@ -1,2 +1,0 @@
-INSERT INTO ACCOUNT_STATE_EVENT VALUES (0, 'OPEN', current_timestamp);
-INSERT INTO MONEY_TRANSFER VALUES(0, 'CREDIT', 999999999, 'initial transfer', 0, 999999999, current_timestamp);
