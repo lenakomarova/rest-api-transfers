@@ -1,6 +1,7 @@
 package org.backend.task.service.impl;
 
 import lombok.AccessLevel;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.backend.task.dto.Account;
@@ -8,11 +9,14 @@ import org.backend.task.dto.AccountState;
 import org.backend.task.dto.Transfer;
 import org.backend.task.dto.TransferError;
 import org.backend.task.events.AccountStateEvent;
+import org.backend.task.events.TransferDirection;
+import org.backend.task.events.TransferEvent;
 import org.backend.task.service.AccountService;
 import org.backend.task.service.DatabaseService;
 import org.backend.task.service.MoneyTransfersService;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -80,5 +84,21 @@ class AccountServiceImpl implements AccountService {
     @Override
     public List<Transfer> getTransfers(Long accountId) {
         return moneyTransfers.getTransfers(accountId);
+    }
+
+    @Override
+    public Optional<Account> createAccountWithMoney(@NonNull BigDecimal amount) {
+        Optional<Account> account = create();
+        if (account.isPresent()) {
+            databaseService.addTransferEvent(account.get().getId(), TransferEvent.builder()
+                    .amount(amount)
+                    .currentBalance(amount)
+                    .description("Initial money deposit")
+                    .direction(TransferDirection.CREDIT)
+                    .involvedAccountId(-1)
+                    .build());
+            return findById(account.get().getId());
+        }
+        return Optional.empty();
     }
 }

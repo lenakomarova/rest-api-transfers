@@ -12,6 +12,7 @@ import org.backend.task.dto.TransferError;
 import org.backend.task.service.AccountService;
 import org.backend.task.service.impl.ServiceContext;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,7 +31,12 @@ public class RequestHandler {
     }
 
     public void create(RoutingContext routingContext) {
-        Optional<Account> account = accountService.create();
+        Optional<String> amount = Optional.ofNullable(routingContext.request().getParam("amount"));
+        Optional<Account> account = amount
+                .filter(s -> s.matches("['\\d]+(\\.\\d)?"))
+                .map(s -> accountService.createAccountWithMoney(new BigDecimal(s)))
+                .orElseGet(accountService::create);
+
         if (account.isPresent()) {
             routingContext.response()
                     .putHeader("content-type", "application/json; charset=utf-8")
@@ -85,10 +91,10 @@ public class RequestHandler {
             routingContext.response().setStatusCode(417).end();
         } else {
             List<Transfer> transfers = accountService.getTransfers(Long.valueOf(id));
-                routingContext.response()
-                        .putHeader("content-type", "application/json; charset=utf-8")
-                        .setStatusCode(200)
-                        .end(Json.encodePrettily(transfers));
+            routingContext.response()
+                    .putHeader("content-type", "application/json; charset=utf-8")
+                    .setStatusCode(200)
+                    .end(Json.encodePrettily(transfers));
         }
     }
 

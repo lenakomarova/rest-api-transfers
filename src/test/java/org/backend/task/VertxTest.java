@@ -86,6 +86,24 @@ public class VertxTest extends AbstractTest {
                 .end();
     }
 
+
+    @Test
+    public void createAccountWithMoney(TestContext context) {
+        final Async async = context.async();
+
+        vertx.createHttpClient().post(port, "localhost", "/accounts?amount=100", response -> {
+            response.handler(body -> {
+                context.assertTrue(response.headers().get("content-type").contains("application/json"));
+                context.assertEquals(response.statusCode(), 201);
+                final Account account = Json.decodeValue(body.toString(), Account.class);
+                context.assertEquals(BigDecimal.valueOf(100), account.getBalance());
+                context.assertNotNull(account);
+                async.complete();
+            });
+        })
+                .end();
+    }
+
     @Test
     public void getAccount(TestContext context) {
         final Async async = context.async();

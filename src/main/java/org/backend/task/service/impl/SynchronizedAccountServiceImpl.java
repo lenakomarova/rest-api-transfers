@@ -10,6 +10,7 @@ import org.backend.task.service.AccountService;
 import org.backend.task.service.LockingService;
 
 import javax.inject.Inject;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,5 +48,10 @@ class SynchronizedAccountServiceImpl implements AccountService {
     @Override
     public List<Transfer> getTransfers(Long accountId) {
         return delegate.getTransfers(accountId);
+    }
+
+    @Override
+    public Optional<Account> createAccountWithMoney(BigDecimal amount) {
+        return delegate.createAccountWithMoney(amount);
     }
 }
